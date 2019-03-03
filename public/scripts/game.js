@@ -1,5 +1,3 @@
-var gridArray = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
-
 function botTurn(serverResponse) {
     if (serverResponse.winner == ' ') {
         $("#winner").html("Tie game");
@@ -11,8 +9,8 @@ function botTurn(serverResponse) {
             randomCell = Math.floor(Math.random() * 9);
             //console.log("randomly selected cell: " + randomCell.toString());
         }
-        $("#cell" + randomCell.toString()).html("O");
-        gridArray[randomCell] = "O";
+        $("#cell" + randomCell.toString()).html("X");
+        gridArray[randomCell] = "X";
         $.ajax({
             data: { grid: JSON.stringify(gridArray) },
             url: "/ttt/play",
@@ -29,14 +27,13 @@ function botTurn(serverResponse) {
 $(document).ready(function () {
     $("#cell0").click(function () {
         if (gridArray[0] == " ") {
-            gridArray[0] = "X";
+            gridArray[0] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 0 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell0").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }
@@ -46,14 +43,13 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#cell1").click(function () {
         if (gridArray[1] == " ") {
-            gridArray[1] = "X";
+            gridArray[1] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 1 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell1").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }
@@ -63,14 +59,13 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#cell2").click(function () {
         if (gridArray[2] == " ") {
-            gridArray[2] = "X";
+            gridArray[2] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 2 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell2").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }
@@ -80,14 +75,13 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#cell3").click(function () {
         if (gridArray[3] == " ") {
-            gridArray[3] = "X";
+            gridArray[3] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 3 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell3").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }
@@ -97,14 +91,13 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#cell4").click(function () {
         if (gridArray[4] == " ") {
-            gridArray[4] = "X";
+            gridArray[4] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 4 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell4").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }
@@ -114,14 +107,13 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#cell5").click(function () {
         if (gridArray[5] == " ") {
-            gridArray[5] = "X";
+            gridArray[5] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 5 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell5").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }
@@ -131,14 +123,13 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#cell6").click(function () {
         if (gridArray[6] == " ") {
-            gridArray[6] = "X";
+            gridArray[6] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 6 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell6").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }
@@ -148,14 +139,13 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#cell7").click(function () {
         if (gridArray[7] == " ") {
-            gridArray[7] = "X";
+            gridArray[7] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 7 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell7").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }
@@ -165,14 +155,13 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#cell8").click(function () {
         if (gridArray[8] == " ") {
-            gridArray[8] = "X";
+            gridArray[8] = "O";
             $.ajax({
-                data: { grid: JSON.stringify(gridArray) },
+                data: { move: 8 },
                 url: "/ttt/play",
                 method: "POST",
                 success: function (response) {
-                    $("#cell8").html("X");
-                    botTurn(response);
+                    drawGrid(response.grid);
                 }
             });
         }

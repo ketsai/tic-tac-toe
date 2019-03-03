@@ -23,9 +23,9 @@ app.use(express.json({limit:'50mb'}));
 app.use(express.urlencoded({limit:'50mb', extended: false}));
 app.use(cookieParser());
 
-app.use('/', tttRouter);
-app.use('/', dbRouter);
 app.use('/', indexRouter);
+app.use('/', dbRouter);
+app.use('/', tttRouter);
 
 //start server
 app.listen(80, ()=> console.log('Project listening on port 80'));
