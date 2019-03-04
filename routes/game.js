@@ -104,6 +104,7 @@ router.post('/ttt/play', async function (req, res, next) {
                 }
             }
         } else { //no move; just return current grid
+            console.log(move);
             db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
                 if (ret) { // Game found
                     console.log("No move; grid =");
@@ -121,6 +122,8 @@ router.post('/listgames', async function (req, res, next) {
     let user = await helper.getUserData(req, res);
     if (user) {
         let games = await helper.listGames(req, res, user);
+        console.log("Found games: ");
+        console.log(games);
         if (games) {
             res.json({ status: "OK", games: games });
         } else {
@@ -136,11 +139,11 @@ router.post('/getgame', async function (req, res, next) {
     if (user) {
         let game = await helper.getGame(req, res, user, req.body.id);
         console.log("Got game: ");
-        console.log(game.grid);
-        if (game != "game not found") {
+        console.log(game);
+        if (game != "game not found" && game.winner) {
             res.json({ status: "OK", grid: game.grid, winner: game.winner });
         } else {
-            res.json({ status: "ERROR", msg: "You did not play a game with this ID." });
+            res.json({ status: "ERROR", msg: "You did not complete a game with this ID." });
         }
     } else {
         res.json({ status: "ERROR", msg: "Please log in to a verified account." });
