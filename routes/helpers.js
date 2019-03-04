@@ -11,6 +11,7 @@ module.exports = {
                     if (err) return handleError(err);
                     if (ret) {
                         if (ret.expire < Date.now()) { // Session expired, remove from db
+                            console.log("Removing expired session.");
                             db.collection('sessions').deleteOne({ 'session': session });
                             res.clearCookie('session');
                             resolve();
@@ -21,11 +22,13 @@ module.exports = {
                             }
                         });
                     } else { // Session not found
+                        console.log("Session could not be found. Removing cookie.");
                         res.clearCookie('session');
                         resolve();
                     }
                 })
             } else { // No session cookie
+                console.log("No session cookie - no user logged in.");
                 resolve();
             }
         });
