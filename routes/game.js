@@ -80,7 +80,7 @@ router.post('/listgames', async function (req, res, next) {
         if (games) {
             res.json({ status: "OK", games: games });
         } else {
-            res.json({ status: "OK", games: JSON.stringify([]), msg: "No games found" });
+            res.json({ status: "OK", games: [], msg: "No games found" });
         }
     } else {
         res.json({ status: "ERROR", msg: "Please log in to a verified account." });
