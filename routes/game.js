@@ -43,6 +43,8 @@ router.post('/ttt/play', async function (req, res, next) {
             res.json({ status: "ERROR", grid: grid, msg: "Tried to move on occupied space" });
         }
         grid[parseInt(move)] = "X";
+        console.log("Player move: ");
+        console.log(grid);
         var winner = checkWinner(grid); //X if X won, O if O won, empty string if no winner, space if tie
         if (winner && winner != '') {
             console.log(winner + ", after player move");
@@ -76,7 +78,7 @@ router.post('/ttt/play', async function (req, res, next) {
                 console.log("No move");
                 res.json({ status: "OK", grid: ret.grid });
             } else {
-                res.json({ status: "ERROR" });
+                res.json({ status: "OK", grid: [" ", " ", " ", " ", " ", " ", " ", " ", " "], msg: "New game" });
             }
         });
     }
