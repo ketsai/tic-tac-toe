@@ -1,8 +1,6 @@
 var mongoose = require('mongoose');
 var db = mongoose.connection;
 
-const NEWGRID = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
-
 module.exports = {
     // Find who is logged in
     getUserData: async function(req, res) {
@@ -47,10 +45,10 @@ module.exports = {
                         console.log("making new game");
                         var date = new Date();
                         var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
-                        db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': NEWGRID, 'winner': '' }) //new game
+                        db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game
                         db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
                         db.collection('games').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
-                        resolve(NEWGRID);
+                        resolve([" ", " ", " ", " ", " ", " ", " ", " ", " "]);
                     }
                 });
             }
