@@ -38,7 +38,7 @@ router.post('/ttt/play', async function (req, res, next) {
     let grid = await helper.findGame(req, res, user);
     var move = req.body.move;
     if (move && move != null) { //valid move was made
-        grid[parseInt(move)] = "O";
+        grid[parseInt(move)] = "X";
         var winner = checkWinner(grid); //X if X won, O if O won, empty string if no winner, space if tie
         if (winner && winner != '') {
             db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
@@ -50,7 +50,7 @@ router.post('/ttt/play', async function (req, res, next) {
                 randomCell = Math.floor(Math.random() * 9);
                 //console.log("randomly selected cell: " + randomCell.toString());
             }  
-            grid[randomCell] = "X";
+            grid[randomCell] = "O";
             winner = checkWinner(grid);
             if (winner && winner != '') { //return winner, update db
                 db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
