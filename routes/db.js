@@ -78,7 +78,9 @@ router.post('/login', function (req, res, next) {
     var v = req.body;
     db.collection('users').findOne({ 'username': v.username }, function (err, ret) {
         if (err) return handleError(err);
-        if (ret != null && bcrypt.compareSync(v.password, ret.password)) { // Ensure that the given password matches the hashed password
+        if (ret != null && !ret.verified) {
+            res.json({ status: "ERROR", msg: 'Please verify your account.' });
+        }else if (ret != null && bcrypt.compareSync(v.password, ret.password)) { // Ensure that the given password matches the hashed password
             var hash = crypto.createHash('sha256'); // Randomly generated session ID
             hash.update(Math.random().toString());
             var session = hash.digest('hex');
