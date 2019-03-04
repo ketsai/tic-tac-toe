@@ -61,9 +61,7 @@ module.exports = {
                 if (count > 0) {
                     db.collection('games').find({ 'user': user.username }, function (err, ret) {
                         ret.on('data', function (doc) {
-                            if (doc.winner && doc.winner != '') {
-                                games.push({ 'id': doc.ID, 'start_date': doc.start_date });
-                            }
+                            games.push({ 'id': doc.ID, 'start_date': doc.start_date });
                         });
                         ret.on('close', function (doc) {
                             resolve(games);
