@@ -46,7 +46,7 @@ module.exports = {
             } else { //start new game
                 db.collection('global_variables').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
                     if (ret) { // Incrementer found
-                        console.log("making new game");
+                        console.log("making new game for new user");
                         var date = new Date();
                         var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
                         db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game

@@ -44,7 +44,7 @@ router.post('/ttt/play', async function (req, res, next) {
         var letBotGo = false;
         if (!piece) { //move was not made through browser
             piece = "X";
-            letBotGo = true;
+            //letBotGo = true;
         }
         if (move && move != null) { //valid move was made
             if (grid[parseInt(move)] != ' ') {
@@ -59,15 +59,15 @@ router.post('/ttt/play', async function (req, res, next) {
                     db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
                     db.collection('global_variables').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
                         if (ret) { // Incrementer found
-                            console.log("making new game");
+                            console.log("making new game after player win");
                             var date = new Date();
                             var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
                             db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game
                             db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
                             db.collection('global_variables').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
+                            res.json({ status: "OK", grid: grid, winner: winner });
                         }
                     });
-                    res.json({ status: "OK", grid: grid, winner: winner });
                 } else { //no winner yet
                     if (!letBotGo) {
                         console.log("Game continues.");
@@ -86,15 +86,15 @@ router.post('/ttt/play', async function (req, res, next) {
                             db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
                             db.collection('global_variables').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
                                 if (ret) { // Incrementer found
-                                    console.log("making new game");
+                                    console.log("making new game after AI win");
                                     var date = new Date();
                                     var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
                                     db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game
                                     db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
                                     db.collection('global_variables').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
+                                    res.json({ status: "OK", grid: grid, winner: winner });
                                 }
                             });
-                            res.json({ status: "OK", grid: grid, winner: winner });
                         } else { //AI didn't win either
                             console.log("Game continues.");
                             db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'grid': grid } });
@@ -140,7 +140,7 @@ router.post('/getgame', async function (req, res, next) {
         let game = await helper.getGame(req, res, user, req.body.id);
         console.log("Got game: ");
         console.log(game);
-        if (game != "game not found" && game.winner) {
+        if (game != "game not found") {
             res.json({ status: "OK", grid: game.grid, winner: game.winner });
         } else {
             res.json({ status: "ERROR", msg: "You did not complete a game with this ID." });
