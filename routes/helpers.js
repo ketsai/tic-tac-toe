@@ -60,15 +60,21 @@ module.exports = {
     listGames: async function (req, res, user) {
         return new Promise(function (resolve, reject) {
             var games = new Array();
-            db.collection('games').find({ 'user': user.username }, function (err, ret) {
-                ret.on('data', function (doc) {
-                    if (doc.winner && doc.winner != '') {
-                        games.push({ 'id': doc.ID, 'start_date': doc.start_date });
-                    }
-                });
-                ret.on('close', function (doc) {
-                    resolve(games);
-                });
+            db.collection('games').find({ 'user': user.username }).count(function (err, count) {
+                if (count > 0) {
+                    db.collection('games').find({ 'user': user.username }, function (err, ret) {
+                        ret.on('data', function (doc) {
+                            if (doc.winner && doc.winner != '') {
+                                games.push({ 'id': doc.ID, 'start_date': doc.start_date });
+                            }
+                        });
+                        ret.on('close', function (doc) {
+                            resolve(games);
+                        });
+                    });
+                } else {
+                    resolve();
+                }
             });
         });
     },
@@ -90,19 +96,25 @@ module.exports = {
             var human = 0;
             var wopr = 0;
             var tie = 0;
-            db.collection('games').find({ 'user': user.username }, function (err, ret) {
-                ret.on('data', function (doc) {
-                    if (doc.winner == 'X') {
-                        wopr += 1;
-                    } else if (doc.winner == 'O') {
-                        human += 1;
-                    } else if (doc.winner == ' ') {
-                        tie += 1;
-                    }
-                });
-                ret.on('close', function (doc) {
-                    resolve({ human: human, wopr: wopr, tie: tie });
-                });
+            db.collection('games').find({ 'user': user.username }).count(function (err, count) {
+                if (count > 0) {
+                    db.collection('games').find({ 'user': user.username }, function (err, ret) {
+                        ret.on('data', function (doc) {
+                            if (doc.winner == 'X') {
+                                wopr += 1;
+                            } else if (doc.winner == 'O') {
+                                human += 1;
+                            } else if (doc.winner == ' ') {
+                                tie += 1;
+                            }
+                        });
+                        ret.on('close', function (doc) {
+                            resolve({ human: human, wopr: wopr, tie: tie });
+                        });
+                    });
+                } else {
+                    resolve();
+                }
             });
         });
     }

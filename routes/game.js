@@ -77,7 +77,11 @@ router.post('/listgames', async function (req, res, next) {
     let user = await helper.getUserData(req, res);
     if (user) {
         let games = await helper.listGames(req, res, user);
-        res.json({ status: "OK", games: games });
+        if (games) {
+            res.json({ status: "OK", games: games });
+        } else {
+            res.json({ status: "ERROR", msg: "No games found" });
+        }
     } else {
         res.json({ status: "ERROR", msg: "Please log in to a verified account." });
     }
@@ -101,8 +105,11 @@ router.post('/getscore', async function (req, res, next) {
     let user = await helper.getUserData(req, res);
     if (user) {
         let score = await helper.getScore(req, res, user);
-        console.log(score);
-        res.json({ status: "OK", human: score.human, wopr: score.wopr, tie: score.tie });
+        if (score) {
+            res.json({ status: "OK", human: score.human, wopr: score.wopr, tie: score.tie });
+        } else {
+            res.json({ status: "ERROR", msg: "No games found" });
+        }
     } else {
         res.json({ status: "ERROR", msg: "Please log in to a verified account." });
     }
