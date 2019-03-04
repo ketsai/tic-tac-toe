@@ -40,14 +40,14 @@ module.exports = {
                     resolve(ret.grid);
                 });
             } else { //no game in progress; make a new one
-                db.collection('games').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
+                db.collection('global_variables').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
                     if (ret) { // Incrementer found
                         console.log("making new game");
                         var date = new Date();
                         var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
                         db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game
                         db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
-                        db.collection('games').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
+                        db.collection('global_variables').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
                         resolve([" ", " ", " ", " ", " ", " ", " ", " ", " "]);
                     }
                 });
