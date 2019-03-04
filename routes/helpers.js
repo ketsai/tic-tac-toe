@@ -18,6 +18,7 @@ module.exports = {
                         }
                         db.collection('users').findOne({ 'username': ret.username }, function (err, ret) {
                             if (ret) { // User found
+                                console.log("User: " + ret.username);
                                 resolve(ret);
                             }
                         });
@@ -81,6 +82,7 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             db.collection('games').findOne({ 'ID': parseInt(id), 'user': user.username, }, function (err, ret) {
                 if (ret) {
+                    console.log("Found game, ID " + id);
                     resolve({ 'grid': ret.grid, 'winner': ret.winner });
                 } else {
                     resolve("game not found");

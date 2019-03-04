@@ -106,7 +106,8 @@ router.post('/ttt/play', async function (req, res, next) {
         } else { //no move; just return current grid
             db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
                 if (ret) { // Game found
-                    console.log("No move");
+                    console.log("No move; grid =");
+                    console.log(ret.grid);
                     res.json({ status: "OK", grid: ret.grid });
                 } else {
                     res.json({ status: "OK", grid: [" ", " ", " ", " ", " ", " ", " ", " ", " "], msg: "New game" });
@@ -134,6 +135,8 @@ router.post('/getgame', async function (req, res, next) {
     let user = await helper.getUserData(req, res);
     if (user) {
         let game = await helper.getGame(req, res, user, req.body.id);
+        console.log("Got game: ");
+        console.log(game.grid);
         if (game != "game not found") {
             res.json({ status: "OK", grid: game.grid, winner: game.winner });
         } else {
