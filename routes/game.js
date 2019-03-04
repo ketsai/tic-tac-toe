@@ -80,7 +80,7 @@ router.post('/listgames', async function (req, res, next) {
         if (games) {
             res.json({ status: "OK", games: games });
         } else {
-            res.json({ status: "ERROR", msg: "No games found" });
+            res.json({ status: "OK", games: JSON.stringify([]), msg: "No games found" });
         }
     } else {
         res.json({ status: "ERROR", msg: "Please log in to a verified account." });
@@ -108,7 +108,7 @@ router.post('/getscore', async function (req, res, next) {
         if (score) {
             res.json({ status: "OK", human: score.human, wopr: score.wopr, tie: score.tie });
         } else {
-            res.json({ status: "ERROR", msg: "No games found" });
+            res.json({ status: "OK", human: 0, wopr: 0, tie: 0, msg: "No games found" });
         }
     } else {
         res.json({ status: "ERROR", msg: "Please log in to a verified account." });
