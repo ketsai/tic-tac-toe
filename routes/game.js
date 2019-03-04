@@ -40,7 +40,7 @@ router.post('/ttt/play', async function (req, res, next) {
     if (move && move != null) { //valid move was made
         if (grid[parseInt(move)] != ' ') {
             console.log("Tried to move on invalid space");
-            res.json({ status: "ERROR", grid: grid, msg: "Tried to move on occupied space" });
+            res.json({ status: "ERROR", grid: grid, msg: "Tried to move on invalid space" });
         } else {
             grid[parseInt(move)] = "X";
             console.log("Player move: ");
