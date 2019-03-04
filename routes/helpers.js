@@ -100,9 +100,9 @@ module.exports = {
                 if (count > 0) {
                     db.collection('games').find({ 'user': user.username }, function (err, ret) {
                         ret.on('data', function (doc) {
-                            if (doc.winner == 'X') {
+                            if (doc.winner == 'O') {
                                 wopr += 1;
-                            } else if (doc.winner == 'O') {
+                            } else if (doc.winner == 'X') {
                                 human += 1;
                             } else if (doc.winner == ' ') {
                                 tie += 1;

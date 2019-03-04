@@ -38,9 +38,14 @@ router.post('/ttt/play', async function (req, res, next) {
     let grid = await helper.findGame(req, res, user);
     var move = req.body.move;
     if (move && move != null) { //valid move was made
+        if (grid[parseInt(move)] != ' ') {
+            console.log("Tried to move on occupied space");
+            res.json({ status: "ERROR", grid: grid, msg: "Tried to move on occupied space" });
+        }
         grid[parseInt(move)] = "X";
         var winner = checkWinner(grid); //X if X won, O if O won, empty string if no winner, space if tie
         if (winner && winner != '') {
+            console.log(winner + ", after player move");
             db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
             db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': -1 } });
             res.json({ status: "OK", grid: grid, winner: winner });
@@ -51,12 +56,16 @@ router.post('/ttt/play', async function (req, res, next) {
                 //console.log("randomly selected cell: " + randomCell.toString());
             }  
             grid[randomCell] = "O";
+            console.log("AI move: ");
+            console.log(grid);
             winner = checkWinner(grid);
             if (winner && winner != '') { //return winner, update db
+                console.log(winner + ", after AI move");
                 db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
                 db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': -1 } });
                 res.json({ status: 'OK', grid: grid, winner: winner });
             } else { //no winner; return grid
+                console.log("Game continues.");
                 db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'grid': grid } });
                 res.json({ status: 'OK', grid: grid });
             }
