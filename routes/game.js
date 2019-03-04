@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
+var mongoose = require('mongoose');
+var db = mongoose.connection;
 var helper = require('./helpers.js');
-
-var NEWGRID = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
 
 function checkWinner(grid) {
     var winner = ' ';
@@ -35,79 +35,77 @@ function checkWinner(grid) {
 router.post('/ttt/play', async function (req, res, next) {
     //check for a winner and return json
     let user = await helper.getUserData(req, res);
+    let grid = await helper.findGame(req, res, user);
     var move = req.body.move;
-    var grid;
-    if (user.currentGameID > -1) { //game in progress
-        db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
-            grid = ret.grid;
-        }
-    } else { //no game in progress; make a new one
-        db.collection('games').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
-            if (ret) { // Incrementer found
-                var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
-                db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': NEWGRID, 'winner': '' }) //new game
-                db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
-                db.collection('games').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (ret.GLOBAL_GAME_ID + 1) } }); //increment next game's ID
-                grid = NEWGRID;
-            } 
-        });
-    }
-    if (move) { //valid move was made
-        grid[move] = "O";
+    if (move && move != null) { //valid move was made
+        grid[parseInt(move)] = "O";
         var winner = checkWinner(grid); //X if X won, O if O won, empty string if no winner, space if tie
-        if (winner != '') {
+        if (winner && winner != '') {
+            db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
+            db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': -1 } });
             res.json({ status: "OK", grid: grid, winner: winner });
         } else { //no winner yet
             var randomCell;
             while (grid[randomCell] != " ") {
                 randomCell = Math.floor(Math.random() * 9);
-                console.log("randomly selected cell: " + randomCell.toString());
-            }
+                //console.log("randomly selected cell: " + randomCell.toString());
+            }  
             grid[randomCell] = "X";
             winner = checkWinner(grid);
-            if (winner != '') { //no winner; return grid
-                res.json({ status: 'OK'});
-            } else { //tie or computer win; return grid, winner, update database game + user currentgame
-
+            if (winner && winner != '') { //return winner, update db
+                db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
+                db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': -1 } });
+                res.json({ status: 'OK', grid: grid, winner: winner });
+            } else { //no winner; return grid
+                db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'grid': grid } });
+                res.json({ status: 'OK', grid: grid });
             }
         }
     } else { //no move; just return current grid
-        db.collection('games').findOne({ 'id': user.currentGameID }, function (err, ret) {
+        db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
             if (ret) { // Game found
+                console.log("No move");
                 res.json({ status: "OK", grid: ret.grid });
             } else {
                 res.json({ status: "ERROR" });
             }
         });
     }
+});
 
-    //function botTurn(serverResponse) {
-    //    if (serverResponse.winner == ' ') {
-    //        $("#winner").html("Tie game");
-    //    } else if (serverResponse.winner != '') {
-    //        $("#winner").html(serverResponse.winner + " wins!");
-    //    } else {
-    //        var randomCell;
-    //        while (gridArray[randomCell] != " ") {
-    //            randomCell = Math.floor(Math.random() * 9);
-    //            console.log("randomly selected cell: " + randomCell.toString());
-    //        }
-    //        $("#cell" + randomCell.toString()).html("X");
-    //        gridArray[randomCell] = "X";
-    //        $.ajax({
-    //            data: { grid: JSON.stringify(gridArray) },
-    //            url: "/ttt/play",
-    //            method: "POST",
-    //            success: function (response) {
-    //                if (response.winner != '') {
-    //                    $("#winner").html(response.winner + " wins!");
-    //                }
-    //            }
-    //        });
-    //    }
-    //}
-    /////////////////////////////////////////////
-    //res.json({ grid: grid, winner: winner });
+router.post('/listgames', async function (req, res, next) {
+    let user = await helper.getUserData(req, res);
+    if (user) {
+        let games = await helper.listGames(req, res, user);
+        res.json({ status: "OK", games: games });
+    } else {
+        res.json({ status: "ERROR", msg: "Please log in to a verified account." });
+    }
+});
+
+router.post('/getgame', async function (req, res, next) {
+    let user = await helper.getUserData(req, res);
+    if (user) {
+        let game = await helper.getGame(req, res, user, req.body.id);
+        if (game != "game not found") {
+            res.json({ status: "OK", grid: game.grid, winner: game.winner });
+        } else {
+            res.json({ status: "ERROR", msg: "You did not play a game with this ID." });
+        }
+    } else {
+        res.json({ status: "ERROR", msg: "Please log in to a verified account." });
+    }
+});
+
+router.post('/getscore', async function (req, res, next) {
+    let user = await helper.getUserData(req, res);
+    if (user) {
+        let score = await helper.getScore(req, res, user);
+        console.log(score);
+        res.json({ status: "OK", human: score.human, wopr: score.wopr, tie: score.tie });
+    } else {
+        res.json({ status: "ERROR", msg: "Please log in to a verified account." });
+    }
 });
 
 module.exports = router;

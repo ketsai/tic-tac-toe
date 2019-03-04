@@ -1,28 +1,11 @@
-function botTurn(serverResponse) {
-    if (serverResponse.winner == ' ') {
-        $("#winner").html("Tie game");
-    } else if (serverResponse.winner != '') {
-        $("#winner").html(serverResponse.winner + " wins!");
-    } else {
-        var randomCell;
-        while (gridArray[randomCell] != " ") {
-            randomCell = Math.floor(Math.random() * 9);
-            //console.log("randomly selected cell: " + randomCell.toString());
-        }
-        $("#cell" + randomCell.toString()).html("X");
-        gridArray[randomCell] = "X";
-        $.ajax({
-            data: { grid: JSON.stringify(gridArray) },
-            url: "/ttt/play",
-            method: "POST",
-            success: function (response) {
-                if (response.winner != '') {
-                    $("#winner").html(response.winner + " wins!");
-                }
-            }
-        });
+function drawGrid(grid) {
+    for (var i = 0; i < 9; i++) {
+        $("#cell" + i.toString()).html(grid[i]);
     }
+    gridArray = grid;
 }
+
+var gridArray = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
 
 $(document).ready(function () {
     $("#cell0").click(function () {
@@ -34,6 +17,11 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
         }
@@ -50,6 +38,11 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
         }
@@ -66,6 +59,11 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
         }
@@ -82,6 +80,11 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
         }
@@ -98,6 +101,11 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
         }
@@ -114,6 +122,11 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
         }
@@ -130,6 +143,11 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
         }
@@ -146,6 +164,11 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
         }
@@ -162,8 +185,24 @@ $(document).ready(function () {
                 method: "POST",
                 success: function (response) {
                     drawGrid(response.grid);
+                    if (response.winner == ' ') {
+                        $("#winner").html("Tie game. <a href=/ttt>Play again?</a>");
+                    } else if (response.winner && response.winner != '') {
+                        $("#winner").html(response.winner + " wins! <a href=/ttt>Play again?</a>");
+                    }
                 }
             });
+        }
+    });
+});
+
+$(document).ready(function () { //load current game
+    $.ajax({
+        data: { move: null },
+        url: "/ttt/play",
+        method: "POST",
+        success: function (response) {
+            drawGrid(response.grid);
         }
     });
 });

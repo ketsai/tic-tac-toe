@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var db = mongoose.connection;
 
+const NEWGRID = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
+
 module.exports = {
     // Find who is logged in
     getUserData: async function(req, res) {
@@ -28,6 +30,80 @@ module.exports = {
             } else { // No session cookie
                 resolve();
             }
+        });
+    },
+    // Find current game for user
+    findGame: async function (req, res, user) {
+        return new Promise(function (resolve, reject) {
+            if (user.currentGameID > -1) { //game in progress
+                db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
+                    console.log("game found: ");
+                    console.log(ret.grid);
+                    resolve(ret.grid);
+                });
+            } else { //no game in progress; make a new one
+                db.collection('games').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
+                    if (ret) { // Incrementer found
+                        console.log("making new game");
+                        var date = new Date();
+                        var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
+                        db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': NEWGRID, 'winner': '' }) //new game
+                        db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
+                        db.collection('games').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
+                        resolve(NEWGRID);
+                    }
+                });
+            }
+        });
+    },
+    //List games previously played by the specified user
+    listGames: async function (req, res, user) {
+        return new Promise(function (resolve, reject) {
+            var games = new Array();
+            db.collection('games').find({ 'user': user.username }, function (err, ret) {
+                ret.on('data', function (doc) {
+                    if (doc.winner && doc.winner != '') {
+                        games.push({ 'id': doc.ID, 'start_date': doc.start_date });
+                    }
+                });
+                ret.on('close', function (doc) {
+                    resolve(games);
+                });
+            });
+        });
+    },
+    //Get game by id number
+    getGame: async function (req, res, user, id) {
+        return new Promise(function (resolve, reject) {
+            db.collection('games').findOne({ 'ID': parseInt(id), 'user': user.username, }, function (err, ret) {
+                if (ret) {
+                    resolve({ 'grid': ret.grid, 'winner': ret.winner });
+                } else {
+                    resolve("game not found");
+                }
+            });
+        });
+    },
+    //Get total score for user
+    getScore: async function (req, res, user) {
+        return new Promise(function (resolve, reject) {
+            var human = 0;
+            var wopr = 0;
+            var tie = 0;
+            db.collection('games').find({ 'user': user.username }, function (err, ret) {
+                ret.on('data', function (doc) {
+                    if (doc.winner == 'X') {
+                        wopr += 1;
+                    } else if (doc.winner == 'O') {
+                        human += 1;
+                    } else if (doc.winner == ' ') {
+                        tie += 1;
+                    }
+                });
+                ret.on('close', function (doc) {
+                    resolve({ human: human, wopr: wopr, tie: tie });
+                });
+            });
         });
     }
 }
