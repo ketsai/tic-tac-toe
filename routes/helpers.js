@@ -35,8 +35,8 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             if (user.currentGameID > -1) { //game in progress
                 db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
-                    console.log("game found: ");
-                    console.log(ret.grid);
+                    //console.log("game found: ");
+                    //console.log(ret.grid);
                     resolve(ret.grid);
                 });
             } else { //no game in progress; make a new one
