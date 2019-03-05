@@ -38,7 +38,7 @@ module.exports = {
     findGame: async function (req, res, user) {
         return new Promise(function (resolve, reject) {
             if (user.currentGameID) { //game in progress
-                db.collection('games').findOne({ 'ID': parseInt(user.currentGameID) }, function (err, ret) {
+                db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
                     //console.log("game found: ");
                     //console.log(ret.grid);
                     resolve(ret.grid);
@@ -49,8 +49,8 @@ module.exports = {
                         console.log("making new game for new user");
                         var date = new Date();
                         var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
-                        db.collection('games').insertOne({ 'ID': parseInt(ret.GLOBAL_GAME_ID), 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game
-                        db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': parseInt(ret.GLOBAL_GAME_ID) } }); //update user's current game to be the new one
+                        db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game
+                        db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
                         db.collection('global_variables').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
                         resolve([" ", " ", " ", " ", " ", " ", " ", " ", " "]);
                     }
@@ -66,7 +66,7 @@ module.exports = {
                 if (count > 0) {
                     db.collection('games').find({ 'user': user.username }, function (err, ret) {
                         ret.on('data', function (doc) {
-                            games.push({ 'id': parseInt(doc.ID), 'start_date': doc.start_date });
+                            games.push({ 'id': doc.ID, 'start_date': doc.start_date });
                         });
                         ret.on('close', function (doc) {
                             resolve(games);
