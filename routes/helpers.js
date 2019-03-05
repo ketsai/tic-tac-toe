@@ -3,7 +3,7 @@ var db = mongoose.connection;
 
 module.exports = {
     // Find who is logged in
-    getUserData: async function(req, res) {
+    getUserData: async function (req, res) {
         return new Promise(function (resolve, reject) { // Create promise for retrieving user data
             var session = req.cookies.session;
             if (session) {
