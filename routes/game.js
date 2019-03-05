@@ -46,8 +46,8 @@ router.post('/ttt/play', async function (req, res, next) {
             piece = "X";
             letBotGo = true;
         }
-        if (move === null || !move) { //no move; just return current grid
-            db.collection('games').findOne({ 'ID': parseInt(user.currentGameID) }, function (err, ret) {
+        if (move === null) { //no move; just return current grid
+            db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
                 if (ret) { // Game found
                     console.log("No move; grid =");
                     console.log(ret.grid);
@@ -57,7 +57,7 @@ router.post('/ttt/play', async function (req, res, next) {
                 }
             });
         } else { //valid move was made
-            console.log("move: " + move.toString());
+            console.log("move: " + move);
             if (grid[parseInt(move)] != ' ') {
                 console.log("Tried to move to invalid space");
                 res.json({ status: "ERROR", grid: grid, msg: "Tried to move to invalid space" });
@@ -67,14 +67,14 @@ router.post('/ttt/play', async function (req, res, next) {
                 console.log(grid);
                 var winner = checkWinner(grid); //X if X won, O if O won, empty string if no winner, space if tie
                 if (winner && winner != '') {
-                    db.collection('games').updateOne({ 'ID': parseInt(user.currentGameID) }, { $set: { 'winner': winner, 'grid': grid } });
+                    db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
                     db.collection('global_variables').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
                         if (ret) { // Incrementer found
                             console.log("making new game after player win");
                             var date = new Date();
                             var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
                             db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game
-                            db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': parseInt(ret.GLOBAL_GAME_ID) } }); //update user's current game to be the new one
+                            db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
                             db.collection('global_variables').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
                             res.json({ status: "OK", grid: grid, winner: winner });
                         }
@@ -82,7 +82,7 @@ router.post('/ttt/play', async function (req, res, next) {
                 } else { //no winner yet
                     if (!letBotGo) {
                         console.log("Game continues.");
-                        db.collection('games').updateOne({ 'ID': parseInt(user.currentGameID) }, { $set: { 'grid': grid } });
+                        db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'grid': grid } });
                         res.json({ status: 'OK', grid: grid });
                     } else {
                         var randomCell;
@@ -94,21 +94,21 @@ router.post('/ttt/play', async function (req, res, next) {
                         console.log(grid);
                         var winner = checkWinner(grid); //X if X won, O if O won, empty string if no winner, space if tie
                         if (winner && winner != '') {
-                            db.collection('games').updateOne({ 'ID': parseInt(user.currentGameID) }, { $set: { 'winner': winner, 'grid': grid } });
+                            db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'winner': winner, 'grid': grid } });
                             db.collection('global_variables').findOne({ 'ID_INCREMENTER': true }, function (err, ret) {
                                 if (ret) { // Incrementer found
                                     console.log("making new game after AI win");
                                     var date = new Date();
                                     var newDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
                                     db.collection('games').insertOne({ 'ID': ret.GLOBAL_GAME_ID, 'start_date': newDate, 'user': user.username, 'grid': [" ", " ", " ", " ", " ", " ", " ", " ", " "], 'winner': '' }) //new game
-                                    db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': parseInt(ret.GLOBAL_GAME_ID) } }); //update user's current game to be the new one
+                                    db.collection('users').updateOne({ 'username': user.username }, { $set: { 'currentGameID': ret.GLOBAL_GAME_ID } }); //update user's current game to be the new one
                                     db.collection('global_variables').updateOne({ 'ID_INCREMENTER': true }, { $set: { 'GLOBAL_GAME_ID': (parseInt(ret.GLOBAL_GAME_ID) + 1) } }); //increment next game's ID
                                     res.json({ status: "OK", grid: grid, winner: winner });
                                 }
                             });
                         } else { //AI didn't win either
                             console.log("Game continues.");
-                            db.collection('games').updateOne({ 'ID': parseInt(user.currentGameID) }, { $set: { 'grid': grid } });
+                            db.collection('games').updateOne({ 'ID': user.currentGameID }, { $set: { 'grid': grid } });
                             res.json({ status: 'OK', grid: grid });
                         }
                     }
