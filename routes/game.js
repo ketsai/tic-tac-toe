@@ -44,9 +44,20 @@ router.post('/ttt/play', async function (req, res, next) {
         var letBotGo = false;
         if (!piece) { //move was not made through browser
             piece = "X";
-            //letBotGo = true;
+            letBotGo = true;
         }
-        if (move && move != null) { //valid move was made
+        if (move === null || !move) { //no move; just return current grid
+            db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
+                if (ret) { // Game found
+                    console.log("No move; grid =");
+                    console.log(ret.grid);
+                    res.json({ status: "OK", grid: ret.grid });
+                } else {
+                    res.json({ status: "OK", grid: [" ", " ", " ", " ", " ", " ", " ", " ", " "], msg: "New game" });
+                }
+            });
+        } else { //valid move was made
+            console.log("move: " + move.toString());
             if (grid[parseInt(move)] != ' ') {
                 console.log("Tried to move to invalid space");
                 res.json({ status: "ERROR", grid: grid, msg: "Tried to move to invalid space" });
@@ -103,17 +114,6 @@ router.post('/ttt/play', async function (req, res, next) {
                     }
                 }
             }
-        } else { //no move; just return current grid
-            console.log(move);
-            db.collection('games').findOne({ 'ID': user.currentGameID }, function (err, ret) {
-                if (ret) { // Game found
-                    console.log("No move; grid =");
-                    console.log(ret.grid);
-                    res.json({ status: "OK", grid: ret.grid });
-                } else {
-                    res.json({ status: "OK", grid: [" ", " ", " ", " ", " ", " ", " ", " ", " "], msg: "New game" });
-                }
-            });
         }
     }
 });
