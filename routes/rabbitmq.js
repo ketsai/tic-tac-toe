@@ -30,7 +30,8 @@ router.post('/speak', function (req, res, next) {
 			var ex = 'hw3';
 			console.log("Speak: '" + msg + "' to key=" + key);
 			ch.assertExchange(ex, 'direct', { durable: false });
-			ch.publish(ex, key, new Buffer.from(msg));
+            ch.publish(ex, key, new Buffer.from(msg));
+            conn.close();
 		});
 	});
 	res.end();

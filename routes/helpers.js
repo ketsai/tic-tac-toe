@@ -125,7 +125,7 @@ module.exports = {
             ch.consume(q.queue, function (msg) {
                 if (msg.content) {
                     console.log("Received msg : '" + msg.content.toString() + "' on " + msg.fields.routingKey);
-                    resolve(msg);
+                    resolve(msg.content.toString());
                 }
             });
         });
