@@ -8,6 +8,7 @@ var mongodb = require('./mongodb');
 var dbRouter = require('./routes/db');
 var tttRouter = require('./routes/game');
 var indexRouter = require('./routes/index');
+var rabbitmq = require('./routes/rabbitmq');
 
 var app = express();
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use('/', indexRouter);
 app.use('/', dbRouter);
 app.use('/', tttRouter);
+app.use('/', rabbitmq);
 
 //start server
 app.listen(80, ()=> console.log('Project listening on port 80'));
