@@ -118,5 +118,16 @@ module.exports = {
                 }
             });
         });
+    },
+    //listen for rabbitmq message
+    listen: async function (ch, q) {
+        return new Promise(function (resolve, reject) {
+            ch.consume(q.queue, function (msg) {
+                if (msg.content) {
+                    console.log("Received msg : '" + msg.content.toString() + "' on " + msg.fields.routingKey);
+                    resolve(msg);
+                }
+            });
+        });
     }
 }
