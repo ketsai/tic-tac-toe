@@ -126,8 +126,11 @@ module.exports = {
                 if (msg.content) {
                     console.log("Received msg : '" + msg.content.toString() + "' on " + msg.fields.routingKey);
                     resolve(msg.content.toString());
+                } else {
+                    console.log("Received no msg on " + msg.fields.routingKey);
+                    resolve();
                 }
-            });
+            }, {noAck: true});
         });
     }
 }
